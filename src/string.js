@@ -96,12 +96,31 @@ module.exports = function(Query) {
     return q;
   }
 
+  function build_delete() {
+    var q = 'DELETE FROM',
+      p = this.p;
+
+    if (typeof(p.from) === 'string') {
+      q += ' ' + p.from;
+    } else {
+      throw 'no from';
+    }
+
+    if (p.where) {
+      q += parse_where(p);
+    }
+
+    return q;
+  }
+
   Query.prototype.toString = Query.prototype.str = function() {
     switch (this.op) {
       case 'select':
         return build_select.call(this);
       case 'update':
         return build_update.call(this);
+      case 'delete':
+        return build_delete.call(this);
       default:
         throw 'unknown opration';
     }
