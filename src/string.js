@@ -1,5 +1,5 @@
 module.exports = function(Query) {
-  function normalize_object(obj) {
+  function normalizeObject(obj) {
     for (var i in obj) {
       if (typeof(obj[i]) === 'string') {
         if (isNaN(parseFloat(obj[i]))) {
@@ -11,7 +11,7 @@ module.exports = function(Query) {
     }
   }
 
-  function join_object(object, sym1, sym2) {
+  function joinObject(object, sym1, sym2) {
     var result = '', comma = false;
 
     for (var i in object) {
@@ -22,29 +22,29 @@ module.exports = function(Query) {
     return result;
   }
 
-  function parse_where(p) {
+  function parseWhere(p) {
     var q = '';
 
     switch (typeof(p.where)) {
-      case 'object':
-        normalize_object(p.where);
-        q += ' WHERE ' + join_object(p.where, '=', ' ');
-        break;
-      case 'string':
-        var w = p.where, m;
-        while ((m = w.match(/[ ]+([=><]|<=|>=)[ ]+/))) {
-          w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
-        }
-        q += ' WHERE ' + w;
-        break;
-      default:
-        throw 'bad where statement';
+    case 'object':
+      normalizeObject(p.where);
+      q += ' WHERE ' + joinObject(p.where, '=', ' ');
+      break;
+    case 'string':
+      var w = p.where, m;
+      while ((m = w.match(/[ ]+([=><]|<=|>=)[ ]+/))) {
+        w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
+      }
+      q += ' WHERE ' + w;
+      break;
+    default:
+      throw 'bad where statement';
     }
 
     return q;
   }
 
-  function build_select() {
+  function buildSelect() {
     var q = 'SELECT',
       p = this.p;
 
@@ -52,10 +52,10 @@ module.exports = function(Query) {
       q += ' DISTINCT';
     }
 
-    if (typeof(p.select) === 'string') {
-      q += ' ' + p.select;
+    if (!p.fields.length) {
+      q += ' *';
     } else {
-      throw 'no select';
+      q += ' ' + p.fields.join(', ');
     }
 
     q += ' FROM';
@@ -66,37 +66,37 @@ module.exports = function(Query) {
     }
 
     if (p.where) {
-      q += parse_where(p);
+      q += parseWhere(p);
     }
 
     return q;
   }
 
-  function build_update() {
+  function buildUpdate() {
     var q = 'UPDATE',
       p = this.p;
 
-    if (typeof(p.update) === 'string') {
-      q += ' ' + p.update;
+    if (typeof(p.table) === 'string') {
+      q += ' ' + p.table;
     } else {
-      throw 'no update';
+      throw new Error('No table specified');
     }
 
     if (typeof(p.set) === 'object') {
-      normalize_object(p.set);
-      q += ' SET ' + join_object(p.set, '=', ' ');
+      normalizeObject(p.set);
+      q += ' SET ' + joinObject(p.set, '=', ' ');
     } else {
       throw 'no set';
     }
 
     if (p.where) {
-      q += parse_where(p);
+      q += parseWhere(p);
     }
 
     return q;
   }
 
-  function build_delete() {
+  function buildDelete() {
     var q = 'DELETE FROM',
       p = this.p;
 
@@ -107,7 +107,7 @@ module.exports = function(Query) {
     }
 
     if (p.where) {
-      q += parse_where(p);
+      q += parseWhere(p);
     }
 
     return q;
@@ -115,14 +115,14 @@ module.exports = function(Query) {
 
   Query.prototype.toString = Query.prototype.str = function() {
     switch (this.op) {
-      case 'select':
-        return build_select.call(this);
-      case 'update':
-        return build_update.call(this);
-      case 'delete':
-        return build_delete.call(this);
-      default:
-        throw 'unknown opration';
+    case 'select':
+      return buildSelect.call(this);
+    case 'update':
+      return buildUpdate.call(this);
+    case 'delete':
+      return buildDelete.call(this);
+    default:
+      throw 'unknown opration';
     }
   };
 };

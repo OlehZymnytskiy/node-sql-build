@@ -2,13 +2,14 @@ var defineFunc = require('./util').defineFunc,
   defineGetter = require('./util').defineGetter;
 
 module.exports = function(Query) {
-  defineFunc(Query, 'select', function(select) {
+  defineFunc(Query, 'select', function() {
     this.op = 'select';
+    this.p.fields = [];
+    return this;
+  });
 
-    if (typeof(select) === 'string') {
-      this.p.select = select;
-    }
-
+  defineFunc(Query, 'field', function(field) {
+    this.p.fields.push(field);
     return this;
   });
 

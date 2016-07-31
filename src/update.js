@@ -1,10 +1,13 @@
-var defineFunc = require('./util').defineFunc,
-  defineGetter = require('./util').defineGetter;
+var defineFunc = require('./util').defineFunc;
 
 module.exports = function(Query) {
-  defineFunc(Query, 'update', function(table) {
+  defineFunc(Query, 'update', function() {
     this.op = 'update';
-    this.p.update = table;
+    return this;
+  });
+
+  defineFunc(Query, 'table', function(table) {
+    this.p.table = table;
     return this;
   });
 

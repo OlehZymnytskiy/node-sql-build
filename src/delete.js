@@ -1,8 +1,7 @@
-var defineFunc = require('./util').defineFunc,
-  defineGetter = require('./util').defineGetter;
+var defineFunc = require('./util').defineFunc;
 
 module.exports = function(Query) {
-  defineGetter(Query, 'delete', function() {
+  defineFunc(Query, 'delete', function() {
     this.op = 'delete';
     return this;
   });
