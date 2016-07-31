@@ -1,4 +1,16 @@
 module.exports = function(Query) {
+  function normalize_object(obj) {
+    for (var i in obj) {
+      if (typeof(obj[i]) === 'string') {
+        if (isNaN(parseFloat(obj[i]))) {
+          obj[i] = "'" + obj[i] + "'";
+        } else {
+          obj[i] = parseFloat(obj[i]);
+        }
+      }
+    }
+  }
+
   function join_object(object, sym1, sym2) {
     var result = '', comma = false;
 
@@ -8,6 +20,28 @@ module.exports = function(Query) {
     }
 
     return result;
+  }
+
+  function parse_where(p) {
+    var q = '';
+
+    switch (typeof(p.where)) {
+      case 'object':
+        normalize_object(p.where);
+        q += ' WHERE ' + join_object(p.where, '=', ' ');
+        break;
+      case 'string':
+        var w = p.where, m;
+        while ((m = w.match(/[ ]+[=><(>=)(<=)][ ]+/))) {
+          w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
+        }
+        q += ' WHERE ' + w;
+        break;
+      default:
+        throw 'bad where statement';
+    }
+
+    return q;
   }
 
   function build_select() {
@@ -32,20 +66,31 @@ module.exports = function(Query) {
     }
 
     if (p.where) {
-      switch (typeof(p.where)) {
-        case 'object':
-          q += ' WHERE ' + join_object(p.where, '=', ' ');
-          break;
-        case 'string':
-          var w = p.where, m;
-          while ((m = w.match(/[ ]+[=><(>=)(<=)][ ]+/))) {
-            w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
-          }
-          q += ' WHERE ' + w;
-          break;
-        default:
-          throw 'bad where statement';
-      }
+      q += parse_where(p);
+    }
+
+    return q;
+  }
+
+  function build_update() {
+    var q = 'UPDATE',
+      p = this.p;
+
+    if (typeof(p.update) === 'string') {
+      q += ' ' + p.update;
+    } else {
+      throw 'no update';
+    }
+
+    if (typeof(p.set) === 'object') {
+      normalize_object(p.set);
+      q += ' SET ' + join_object(p.set, '=', ' ');
+    } else {
+      throw 'no set';
+    }
+
+    if (p.where) {
+      q += parse_where(p);
     }
 
     return q;
@@ -55,6 +100,8 @@ module.exports = function(Query) {
     switch (this.op) {
       case 'select':
         return build_select.call(this);
+      case 'update':
+        return build_update.call(this);
       default:
         throw 'unknown opration';
     }
