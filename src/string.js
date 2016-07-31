@@ -32,7 +32,7 @@ module.exports = function(Query) {
         break;
       case 'string':
         var w = p.where, m;
-        while ((m = w.match(/[ ]+[=><(>=)(<=)][ ]+/))) {
+        while ((m = w.match(/[ ]+([=><]|<=|>=)[ ]+/))) {
           w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
         }
         q += ' WHERE ' + w;
