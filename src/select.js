@@ -28,6 +28,12 @@ module.exports = function(Query) {
   defineFunc(Query, 'where', function(where) {
     if (typeof(where) === 'object') {
       this.p.where = where;
+    } else if (typeof(where) === 'string' && arguments.length >= 2) {
+      var w = where, i=1;
+      while (w.indexOf('?') !== -1) {
+        w = w.replace(/[?]/, arguments[i++]);
+      }
+      this.p.where = w;
     }
 
     return this;

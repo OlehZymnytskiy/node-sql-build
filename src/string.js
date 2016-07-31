@@ -32,7 +32,20 @@ module.exports = function(Query) {
     }
 
     if (p.where) {
-      q += ' WHERE ' + join_object(p.where, '=', ' ');
+      switch (typeof(p.where)) {
+        case 'object':
+          q += ' WHERE ' + join_object(p.where, '=', ' ');
+          break;
+        case 'string':
+          var w = p.where, m;
+          while ((m = w.match(/[ ]+[=><(>=)(<=)][ ]+/))) {
+            w = w.replace(m[0], m[0].replace(/[ ]/g, ''));
+          }
+          q += ' WHERE ' + w;
+          break;
+        default:
+          throw 'bad where statement';
+      }
     }
 
     return q;
