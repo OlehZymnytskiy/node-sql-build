@@ -1,6 +1,9 @@
-var defineFunc = require('./util').defineFunc;
+var defineFunc = require('./util').defineFunc,
+  normalizeObject = require('./string').normalizeObject,
+  joinObject = require('./string').joinObject,
+  parseWhere = require('./string').parseWhere;
 
-module.exports = function(Query) {
+function UpdateModule(Query) {
   defineFunc(Query, 'update', function() {
     this.op = 'update';
     return this;
@@ -17,5 +20,31 @@ module.exports = function(Query) {
   });
 
   // use where from select.js
+}
+
+UpdateModule.toString = function() {
+  var q = 'UPDATE',
+    p = this.p;
+
+  if (typeof(p.table) === 'string') {
+    q += ' ' + p.table;
+  } else {
+    throw new Error('No table specified');
+  }
+
+  if (typeof(p.set) === 'object') {
+    normalizeObject(p.set);
+    q += ' SET ' + joinObject(p.set, '=', ' ');
+  } else {
+    throw 'no set';
+  }
+
+  if (p.where) {
+    q += parseWhere(p);
+  }
+
+  return q;
 };
+
+module.exports = UpdateModule;
 

@@ -1,7 +1,8 @@
 var defineFunc = require('./util').defineFunc,
-  defineGetter = require('./util').defineGetter;
+  defineGetter = require('./util').defineGetter,
+  parseWhere = require('./string').parseWhere;
 
-module.exports = function(Query) {
+function SelectModule(Query) {
   defineFunc(Query, 'select', function() {
     this.op = 'select';
     this.p.fields = [];
@@ -39,5 +40,35 @@ module.exports = function(Query) {
 
     return this;
   });
+}
+
+SelectModule.toString = function() {
+  var q = 'SELECT',
+    p = this.p;
+
+  if (p.distinct) {
+    q += ' DISTINCT';
+  }
+
+  if (!p.fields.length) {
+    q += ' *';
+  } else {
+    q += ' ' + p.fields.join(', ');
+  }
+
+  q += ' FROM';
+  if (typeof(p.from) === 'string') {
+    q += ' ' + p.from;
+  } else {
+    throw 'no from';
+  }
+
+  if (p.where) {
+    q += parseWhere(p);
+  }
+
+  return q;
 };
+
+module.exports = SelectModule;
 
