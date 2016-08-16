@@ -23,15 +23,17 @@ function normalizeValue(val) {
 }
 
 function normalizeObject(obj) {
+  var result = {};
+
   for (var i in obj) {
     if (typeof(obj[i]) === 'string') {
-      if (isNaN(parseFloat(obj[i]))) {
-        obj[i] = "'" + obj[i] + "'";
-      } else {
-        obj[i] = parseFloat(obj[i]);
-      }
+      result[i] = "'" + obj[i] + "'";
+    } else {
+      result[i] = obj[i];
     }
   }
+
+  return result;
 }
 
 function parseWhere(p) {
@@ -39,8 +41,7 @@ function parseWhere(p) {
 
   switch (typeof(p.where)) {
     case 'object':
-      normalizeObject(p.where);
-      q += ' WHERE ' + joinObject(p.where, '=', ' AND ');
+      q += ' WHERE ' + joinObject(normalizeObject(p.where), '=', ' AND ');
       break;
     case 'string':
       var w = p.where, m;
