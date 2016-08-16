@@ -12,7 +12,7 @@
     "validate": "npm ls"
   },
   "keywords": [],
-  "author": "",
+  "author": "Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",

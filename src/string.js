@@ -9,6 +9,18 @@ function joinObject(object, sym1, sym2) {
   return result;
 }
 
+function normalizeValue(val) {
+  if (val === undefined || val === null) {
+    return 'NULL';
+  }
+
+  if (typeof(val) === 'string') {
+    return "'" + val + "'";
+  }
+
+  return val;
+}
+
 function normalizeObject(obj) {
   for (var i in obj) {
     if (typeof(obj[i]) === 'string') {
@@ -43,6 +55,12 @@ function parseWhere(p) {
   return q;
 }
 
+function normalizeIdentifier(ident) {
+  return ident.split('.').map(function(i) {
+    return '"' + i + '"';
+  }).join('.');
+}
+
 function StringModule(Query) {
   Query.prototype.toString = Query.prototype.str = function() {
     switch (this.op) {
@@ -52,6 +70,8 @@ function StringModule(Query) {
         return require('./update').toString.call(this);
       case 'delete':
         return require('./delete').toString.call(this);
+      case 'insert':
+        return require('./insert').toString.call(this);
       default:
         throw 'unknown opration';
     }
@@ -61,6 +81,8 @@ function StringModule(Query) {
 StringModule.parseWhere = parseWhere;
 StringModule.normalizeObject = normalizeObject;
 StringModule.joinObject = joinObject;
+StringModule.normalizeIdentifier = normalizeIdentifier;
+StringModule.normalizeValue = normalizeValue;
 
 module.exports = StringModule;
 
