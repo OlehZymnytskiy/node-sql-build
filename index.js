@@ -1,3 +1,15 @@
+if (!Array.from) {
+  Array.from = function(obj) {
+    var result = [];
+
+    for (var i=0;i<obj.length;i++) {
+      result[i] = obj[i];
+    }
+
+    return result;
+  };
+}
+
 function Query() {
   this.p = {}; // for params
 }
