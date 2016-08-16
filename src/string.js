@@ -4,6 +4,7 @@ function joinObject(object, sym1, sym2) {
   for (var i in object) {
     if (comma) result += sym2 || ' ';
     result += i + sym1 + object[i];
+    comma = true;
   }
 
   return result;
@@ -39,7 +40,7 @@ function parseWhere(p) {
   switch (typeof(p.where)) {
     case 'object':
       normalizeObject(p.where);
-      q += ' WHERE ' + joinObject(p.where, '=', ' ');
+      q += ' WHERE ' + joinObject(p.where, '=', ' AND ');
       break;
     case 'string':
       var w = p.where, m;

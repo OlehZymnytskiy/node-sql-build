@@ -14,6 +14,10 @@ describe('Select statement', function() {
     expect(q.select().from('users').where({ id: 1 }).str()).to.equal('SELECT * FROM "users" WHERE id=1');
   });
 
+  it('should parse where from object', function() {
+    expect(q.select().from('users').where({ id: 1, user: 'oleh' }).str()).to.equal('SELECT * FROM "users" WHERE id=1 AND user=\'oleh\'');
+  });
+
   it('should parse where from string and arguments', function() {
     expect(q.select().from('users').where('id = ?', 1).str()).to.equal('SELECT * FROM "users" WHERE id=1');
   });
