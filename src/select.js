@@ -40,6 +40,14 @@ function SelectModule(Query) {
 
     return this;
   });
+
+  defineFunc(Query, 'limit', function(limit) {
+    if (typeof(limit) === 'number') {
+      this.p.limit = limit;
+    } else throw new Error('limit must be a Number');
+
+    return this;
+  });
 }
 
 SelectModule.toString = function() {
@@ -53,18 +61,26 @@ SelectModule.toString = function() {
   if (!p.fields.length) {
     q += ' *';
   } else {
-    q += ' ' + p.fields.join(', ');
+    q += ' ' + p.fields.map(function(f) {
+      return '"' + f + '"';
+    }).join(', ');
   }
 
   q += ' FROM';
   if (typeof(p.from) === 'string') {
-    q += ' ' + p.from;
+    q += ' ' + p.from.split('.').map(function(f) {
+      return '"' + f + '"';
+    }).join('.');
   } else {
     throw 'no from';
   }
 
   if (p.where) {
     q += parseWhere(p);
+  }
+
+  if (p.limit !== undefined) {
+    q += ' LIMIT ' + p.limit;
   }
 
   return q;

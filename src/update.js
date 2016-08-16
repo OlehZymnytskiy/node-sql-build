@@ -33,8 +33,7 @@ UpdateModule.toString = function() {
   }
 
   if (typeof(p.set) === 'object') {
-    normalizeObject(p.set);
-    q += ' SET ' + joinObject(p.set, '=', ' ');
+    q += ' SET ' + joinObject(normalizeObject(p.set), '=', ' ');
   } else {
     throw 'no set';
   }
