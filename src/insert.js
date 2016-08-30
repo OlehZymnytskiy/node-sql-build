@@ -13,6 +13,10 @@ var InsertModule = function(Query) {
   });
 
   Query.method('values', function() {
+    if (arguments.length === 1 && Array.isArray(arguments[0])) {
+      this.p.values = arguments[0];
+      return this;
+    }
     if (arguments.length) {
       this.p.values = Array.from(arguments);
     }
