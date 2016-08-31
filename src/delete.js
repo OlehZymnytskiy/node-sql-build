@@ -16,7 +16,7 @@ DeleteModule.toString = function() {
     p = this.p;
 
   if (typeof(p.from) === 'string') {
-    q += ' ' + p.from;
+    q += ' "' + p.from + '"';
   } else {
     throw 'no from';
   }

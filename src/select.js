@@ -61,9 +61,7 @@ SelectModule.toString = function() {
   if (!p.fields.length) {
     q += ' *';
   } else {
-    q += ' ' + p.fields.map(function(f) {
-      return '"' + f + '"';
-    }).join(', ');
+    q += ' ' + p.fields.join(', ');
   }
 
   q += ' FROM';

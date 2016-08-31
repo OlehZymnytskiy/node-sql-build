@@ -26,14 +26,14 @@ UpdateModule.toString = function() {
   var q = 'UPDATE',
     p = this.p;
 
-  if (typeof(p.table) === 'string') {
-    q += ' ' + p.table;
+  if (typeof(p.table) === 'string' && p.table) {
+    q += ' "' + p.table + '"';
   } else {
     throw new Error('No table specified');
   }
 
   if (typeof(p.set) === 'object') {
-    q += ' SET ' + joinObject(normalizeObject(p.set), '=', ' ');
+    q += ' SET ' + joinObject(normalizeObject(p.set), '=', ', ');
   } else {
     throw 'no set';
   }
